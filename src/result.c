@@ -3,9 +3,12 @@
 
 #include "result.h"
 
+#define ERROR_ANSI "\x1b[1;31m"
+#define RESET_ANSI "\x1b[0m"
+
 static void print_error(char* error_message) {
 	if (error_message == NULL) return;
-	fprintf(stderr, "Error: %s\n", error_message);
+	fprintf(stderr, ERROR_ANSI"Error:"RESET_ANSI" %s\n", error_message);
 }
 
 int is_ok(int status, char* error_message) {
