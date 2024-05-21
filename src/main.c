@@ -1,10 +1,12 @@
 #include <stddef.h>
 #include <string.h>
 #include <unistd.h>
+#include <elf.h>
 
 #include "options.h"
 #include "env.h"
 #include "path.h"
+#include "elf_info.h"
 #include "result.h"
 
 int main(int argc, char* argv[], char *envp[]) {
@@ -18,8 +20,9 @@ int main(int argc, char* argv[], char *envp[]) {
 		file = argv[0];
 		is_ok(access(argv[0], X_OK | R_OK), "Cannot find the executable");
 	}
-	//check 32-bit or 64-bit
+	uint8_t* elf_ident = is_okp(elf_read_ident(file), "Invalid ELF identifier");
+	uint8_t elf_class = elf_ident[EI_CLASS];
 	//start child
 	//trace child
-	(void) file;
+	(void) elf_class;
 }

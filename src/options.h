@@ -1,7 +1,7 @@
 #ifndef OPTIONS_H
 # define OPTIONS_H
 
-#include "stdbool.h"
+# include <stdbool.h>
 
 typedef struct options_s {
 	bool summary;
