@@ -1,5 +1,4 @@
 #include <string.h>
-#include <strings.h>
 #include <elf.h>
 
 #include "file.h"
