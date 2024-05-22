@@ -7,6 +7,7 @@
 #include "env.h"
 #include "path.h"
 #include "elf_info.h"
+#include "trace.h"
 #include "result.h"
 
 int main(int argc, char* argv[], char *envp[]) {
@@ -25,7 +26,8 @@ int main(int argc, char* argv[], char *envp[]) {
 
 	uint8_t* elf_ident = is_okp(elf_read_ident(file), "Invalid ELF identifier");
 	uint8_t elf_class = elf_ident[EI_CLASS];
-	//start child
+	
+	pid_t tracee_pid = is_oks(create_tracee(file, argv, envp), "Failed to initialize tracee");
 	//trace child
 	(void) elf_class;
 }
