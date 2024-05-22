@@ -3,6 +3,8 @@
 #include <unistd.h>
 #include <elf.h>
 
+#include <sys/types.h>
+
 #include "options.h"
 #include "env.h"
 #include "path.h"
