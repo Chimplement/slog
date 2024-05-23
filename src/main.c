@@ -30,6 +30,6 @@ int main(int argc, char* argv[], char *envp[]) {
     uint8_t elf_class = elf_ident[EI_CLASS];
     
     pid_t tracee_pid = is_oks(create_tracee(file, argv, envp), "Failed to initialize tracee");
-    //trace child
-    (void) elf_class, (void) tracee_pid;
+    trace_loop(tracee_pid);
+    (void) elf_class;
 }
