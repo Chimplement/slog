@@ -52,7 +52,7 @@ int trace_loop(pid_t tracee_pid, int* status, trace_callback_t callbacks[], size
             return (-1);
         if (wait_and_block(tracee_pid, status) == -1)
             return (-1);
-        switch (callbacks[i].func(tracee_pid))
+        switch (callbacks[i].func(tracee_pid, callbacks[i].param))
         {
             case TC_OK:
                 break;

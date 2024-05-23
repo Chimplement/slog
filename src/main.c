@@ -11,6 +11,7 @@
 #include "elf_info.h"
 #include "proc.h"
 #include "trace.h"
+#include "syscall_log.h"
 #include "result.h"
 
 #include <stdio.h>
@@ -43,9 +44,10 @@ int main(int argc, char* argv[], char *envp[]) {
         tracee_pid,
         &status,
         (trace_callback_t[]) {
-            {TC_SYSCALL, test},
+            {TC_SYSCALL, log_syscall_call, NULL},
+            {TC_SYSCALL, log_syscall_return, NULL},
         },
-        1
+        2
     ), "Unexpected error while tracing the process");
     exit_using_status(status);
 }

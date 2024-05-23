@@ -1,7 +1,8 @@
 #ifndef TRACE_H
 # define TRACE_H
 
-#include <sys/ptrace.h>
+# include <sys/types.h>
+# include <sys/ptrace.h>
 
 enum {
     TC_OK = 0,
@@ -14,7 +15,8 @@ typedef struct trace_callback_s {
         TC_NEXT_STEP = PTRACE_SYSCALL,
         TC_SYSCALL = PTRACE_SINGLESTEP,
     } at;
-    int (*func)(pid_t);
+    int (*func)();
+    void* param;
 } trace_callback_t;
 
 pid_t create_tracee(char* file, char* argv[], char* envp[]);
