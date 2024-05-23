@@ -12,6 +12,12 @@
 #include "trace.h"
 #include "result.h"
 
+#include <stdio.h>
+int test(pid_t tracee_pid) {
+    printf("syscall from pid %i\n", tracee_pid);
+    return (TC_OK);
+}
+
 int main(int argc, char* argv[], char *envp[]) {
     options_t options;
     is_ok(parse_options(&options, &argc, &argv), NULL);
@@ -30,6 +36,14 @@ int main(int argc, char* argv[], char *envp[]) {
     uint8_t elf_class = elf_ident[EI_CLASS];
     
     pid_t tracee_pid = is_oks(create_tracee(file, argv, envp), "Failed to initialize tracee");
-    trace_loop(tracee_pid);
+    int status;
+    is_ok(trace_loop(
+        tracee_pid,
+        &status,
+        (trace_callback_t[]) {
+            {TC_SYSCALL, test},
+        },
+        1
+    ), "Unexpected error while tracing the process");
     (void) elf_class;
 }
