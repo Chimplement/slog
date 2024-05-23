@@ -44,10 +44,19 @@ int main(int argc, char* argv[], char *envp[]) {
         tracee_pid,
         &status,
         (trace_callback_t[]) {
-            {TC_SYSCALL, log_syscall_call, NULL},
-            {TC_SYSCALL, log_syscall_return, NULL},
+            {
+                TC_SYSCALL,
+                options.summary ? syscall_count_call : syscall_log_call,
+                NULL
+            },
+            {
+                TC_SYSCALL,
+                options.summary ? syscall_count_return : syscall_log_return,
+                NULL
+            },
         },
         2
     ), "Unexpected error while tracing the process");
+    if (options.summary) {} //display summary
     exit_using_status(status);
 }

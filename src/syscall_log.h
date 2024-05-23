@@ -3,7 +3,10 @@
 
 # include <sys/types.h>
 
-int log_syscall_call(pid_t pid, void* syscall_table);
-int log_syscall_return(pid_t pid, void* syscall_table);
+int syscall_log_call(pid_t pid, void* syscall_table);
+int syscall_log_return(pid_t pid, void* syscall_table);
+
+int syscall_count_call(pid_t pid, void* syscall_table);
+int syscall_count_return(pid_t pid, void* syscall_table);
 
 #endif
