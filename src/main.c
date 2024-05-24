@@ -14,12 +14,6 @@
 #include "syscall_log.h"
 #include "result.h"
 
-#include <stdio.h>
-int test(pid_t tracee_pid) {
-    printf("syscall from pid %i\n", tracee_pid);
-    return (TC_OK);
-}
-
 int main(int argc, char* argv[], char *envp[]) {
     options_t options;
     is_ok(parse_options(&options, &argc, &argv), NULL);
