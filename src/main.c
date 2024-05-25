@@ -80,6 +80,6 @@ int main(int argc, char* argv[], char *envp[]) {
     if (options.summary)
         syscall_log_summary(syscall_table);
     else
-        fprintf(stderr, "+++ exited with %i +++", exit_code);
+        fprintf(stderr, "+++ exited with %i +++\n", exit_code);
     return(exit_code);
 }
