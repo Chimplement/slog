@@ -52,7 +52,6 @@ int main(int argc, char* argv[], char *envp[]) {
             syscall_table.size = sizeof(syscall_table_content_x86_64) /\
                                 sizeof(*syscall_table_content_x86_64);
             break;
-        
         default:
             is_ok(-1, "Invalid  ELF class");
     }
