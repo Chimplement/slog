@@ -75,6 +75,8 @@ int main(int argc, char* argv[], char *envp[]) {
         },
         2
     ), "Unexpected error while tracing the process");
-    if (options.summary) {} //display summary
+    if (options.summary)
+        syscall_log_summary(syscall_table);
+    else {} // print exit status
     exit_using_status(status);
 }

@@ -25,3 +25,7 @@ int syscall_count_return(pid_t pid, syscall_table_t* syscall_table) {
     (void) syscall_table;
     return (TC_OK);
 }
+
+void syscall_log_summary(syscall_table_t syscall_table) {
+    (void) syscall_table;
+}

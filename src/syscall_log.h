@@ -19,4 +19,6 @@ int syscall_log_return(pid_t pid, syscall_table_t* syscall_table);
 int syscall_count_call(pid_t pid, syscall_table_t* syscall_table);
 int syscall_count_return(pid_t pid, syscall_table_t* syscall_table);
 
+void syscall_log_summary(syscall_table_t syscall_table);
+
 #endif
