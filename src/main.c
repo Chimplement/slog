@@ -14,11 +14,11 @@
 #include "syscall_log.h"
 #include "result.h"
 
-syscall_info_t syscall_table_content_x86_32[] = {
+static syscall_info_t syscall_table_content_x86_32[] = {
 #include <syscall_tables/x86_32.h>
 };
 
-syscall_info_t syscall_table_content_x86_64[] = {
+static syscall_info_t syscall_table_content_x86_64[] = {
 #include <syscall_tables/x86_64.h>
 };
 
