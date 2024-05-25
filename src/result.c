@@ -6,9 +6,14 @@
 #define ERROR_ANSI "\x1b[1;31m"
 #define RESET_ANSI "\x1b[0m"
 
-static void print_error(char* error_message) {
+void print_error(char* error_message) {
     if (error_message == NULL) return;
     fprintf(stderr, ERROR_ANSI"Error:"RESET_ANSI" %s\n", error_message);
+}
+
+void exit_error_message(char* error_message) {
+    print_error(error_message);
+    exit(1);
 }
 
 int is_ok(int status, char* error_message) {

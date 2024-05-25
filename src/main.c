@@ -54,7 +54,7 @@ int main(int argc, char* argv[], char *envp[]) {
                                 sizeof(*syscall_table_content_x86_64);
             break;
         default:
-            is_ok(-1, "Invalid  ELF class");
+            exit_error_message("Invalid  ELF class");
     }
     
     pid_t tracee_pid = is_oks(create_tracee(file, argv, envp), "Failed to initialize tracee");
@@ -81,5 +81,5 @@ int main(int argc, char* argv[], char *envp[]) {
         syscall_log_summary(syscall_table);
     else
         fprintf(stderr, "+++ exited with %i +++", exit_code);
-    exit(exit_code);
+    return(exit_code);
 }
