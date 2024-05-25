@@ -2,6 +2,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <elf.h>
+#include <stdio.h>
 
 #include <sys/types.h>
 
@@ -75,8 +76,10 @@ int main(int argc, char* argv[], char *envp[]) {
         },
         2
     ), "Unexpected error while tracing the process");
+    int exit_code = get_exit_code(status);
     if (options.summary)
         syscall_log_summary(syscall_table);
-    else {} // print exit status
-    exit_using_status(status);
+    else
+        fprintf(stderr, "+++ exited with %i +++", exit_code);
+    exit(exit_code);
 }

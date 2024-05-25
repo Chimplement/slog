@@ -14,10 +14,10 @@ pid_t create_child(char* file, char* argv[], char* envp[]) {
     return (pid);
 }
 
-void exit_using_status(int status) {
+int get_exit_code(int status) {
     if (WIFEXITED(status))
-        exit(WEXITSTATUS(status));
+        return (WEXITSTATUS(status));
     if (WIFSIGNALED(status))
-        exit(WTERMSIG(status) + 128);
-    exit(0);
+        return (WTERMSIG(status) + 128);
+    return (0);
 }
