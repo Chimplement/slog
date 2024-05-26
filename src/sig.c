@@ -13,12 +13,14 @@ void init_interrupts_set(sigset_t *set) {
 
 void sig_block_interrupts() {
     sigset_t interrupts_set;
+
     init_interrupts_set(&interrupts_set);
     sigprocmask(SIG_BLOCK, &interrupts_set, NULL);
 }
 
 void sig_unblock_interrupts() {
     sigset_t interrupts_set;
+
     init_interrupts_set(&interrupts_set);
     sigprocmask(SIG_UNBLOCK, &interrupts_set, NULL);
 }
