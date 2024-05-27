@@ -73,5 +73,5 @@ int tracee_get_regs(pid_t tracee_pid, struct user_regs_struct* regs) {
 }
 
 int tracee_get_siginfo(pid_t tracee_pid, siginfo_t* siginfo) {
-    return (ptrace(PTRACE_GETSIGINFO, tracee_pid, 0, &siginfo));
+    return (ptrace(PTRACE_GETSIGINFO, tracee_pid, 0, siginfo));
 }

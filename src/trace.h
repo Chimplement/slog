@@ -3,7 +3,7 @@
 
 # undef _POSIX_C_SOURCE
 # define _POSIX_C_SOURCE 199309L
-# include <signal.h>
+# include <sys/signal.h>
 
 # include <sys/types.h>
 # include <sys/user.h>
