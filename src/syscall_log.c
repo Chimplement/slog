@@ -1,17 +1,20 @@
 #include <stdio.h>
 #include <string.h>
 #include <elf.h>
+#include <errno.h>
 
 #include <sys/syscall.h>
+#include <sys/wait.h>
 
 #include "trace.h"
 
 #include "syscall_log.h"
 
-int syscall_log_call(pid_t tracee_pid, syscall_table_t* syscall_table) {
+int syscall_log_call(pid_t tracee_pid, int* status, syscall_table_t* syscall_table) {
     struct user_regs_struct regs;
-    if (tracee_get_regs(tracee_pid, &regs) == -1)
+    if (tracee_get_regs(tracee_pid, &regs) == -1) {
         return (TC_ERROR);
+    }
 
     unsigned long long syscall_num = regs.orig_rax;
     if (syscall_num >= syscall_table->size)
@@ -29,20 +32,20 @@ int syscall_log_call(pid_t tracee_pid, syscall_table_t* syscall_table) {
         fprintf(stderr, ") = ?\n");
         return (TC_EXIT);
     }
-
+    (void) status;
     return (TC_OK);
 }
 
-int syscall_log_return(pid_t tracee_pid, syscall_table_t* syscall_table) {
+int syscall_log_return(pid_t tracee_pid, int* status, syscall_table_t* syscall_table) {
     struct user_regs_struct regs;
     if (tracee_get_regs(tracee_pid, &regs) == -1)
         return (TC_ERROR);
 
-    siginfo_t siginfo;
-    if (tracee_get_siginfo(tracee_pid, &siginfo) == -1)
-        return (TC_ERROR);
+    if (WIFSTOPPED(*status) && WSTOPSIG(*status) != (SIGTRAP | 0x80)) {
+        siginfo_t siginfo;
+        if (tracee_get_siginfo(tracee_pid, &siginfo) == -1)
+            return (TC_ERROR);
 
-    if (siginfo.si_signo != SIGTRAP) {
         fprintf(stderr, "<unfinished ...>\n");
         fprintf(stderr, "--- Signal: %s {si_signo=%i, si_code=%i, si_pid=%i} ---\n", strsignal(siginfo.si_signo), siginfo.si_signo, siginfo.si_code, siginfo.si_pid);
     } else {
@@ -52,15 +55,17 @@ int syscall_log_return(pid_t tracee_pid, syscall_table_t* syscall_table) {
     return (TC_OK);
 }
 
-int syscall_count_call(pid_t tracee_pid, syscall_table_t* syscall_table) {
+int syscall_count_call(pid_t tracee_pid, int* status, syscall_table_t* syscall_table) {
     (void) tracee_pid;
     (void) syscall_table;
+    (void) status;
     return (TC_OK);
 }
 
-int syscall_count_return(pid_t tracee_pid, syscall_table_t* syscall_table) {
+int syscall_count_return(pid_t tracee_pid, int* status, syscall_table_t* syscall_table) {
     (void) tracee_pid;
     (void) syscall_table;
+    (void) status;
     return (TC_OK);
 }
 

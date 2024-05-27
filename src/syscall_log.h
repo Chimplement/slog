@@ -16,11 +16,11 @@ typedef struct syscall_table_s {
     syscall_info_t* content;
 } syscall_table_t;
 
-int syscall_log_call(pid_t pid, syscall_table_t* syscall_table);
-int syscall_log_return(pid_t pid, syscall_table_t* syscall_table);
+int syscall_log_call(pid_t pid, int* status, syscall_table_t* syscall_table);
+int syscall_log_return(pid_t pid, int* status, syscall_table_t* syscall_table);
 
-int syscall_count_call(pid_t pid, syscall_table_t* syscall_table);
-int syscall_count_return(pid_t pid, syscall_table_t* syscall_table);
+int syscall_count_call(pid_t pid, int* status, syscall_table_t* syscall_table);
+int syscall_count_return(pid_t pid, int* status, syscall_table_t* syscall_table);
 
 void syscall_log_summary(syscall_table_t syscall_table);
 

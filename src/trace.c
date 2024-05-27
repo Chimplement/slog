@@ -39,6 +39,9 @@ pid_t create_tracee(char* file, char* argv[], char* envp[]) {
         kill(pid, SIGKILL);
         return (-1);
     }
+    if (ptrace(PTRACE_SETOPTIONS, pid, 0, PTRACE_O_TRACESYSGOOD) == -1) {
+        return (-1);
+    }
     
     return (pid);
 }
@@ -51,7 +54,7 @@ int trace_loop(pid_t tracee_pid, int* status, trace_callback_t callbacks[], size
             return (-1);
         if (wait_and_block(tracee_pid, status) == -1)
             return (-1);
-        switch (callbacks[i].func(tracee_pid, callbacks[i].param))
+        switch (callbacks[i].func(tracee_pid, status, callbacks[i].param))
         {
             case TC_OK:
                 break;
