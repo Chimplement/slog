@@ -48,7 +48,7 @@ int syscall_log_return(pid_t tracee_pid, int* status, syscall_table_t* syscall_t
     if (regs.rax == (unsigned long)-ENOSYS)
         return(syscall_log_call(tracee_pid, status, syscall_table));
 
-    if (WIFSTOPPED(*status) && WSTOPSIG(*status) != (SIGTRAP | 0x80)) {
+    if (WSTOPSIG(*status) != (SIGTRAP | 0x80)) {
         siginfo_t siginfo;
         if (tracee_get_siginfo(tracee_pid, &siginfo) == -1)
             return (TC_ERROR);
@@ -58,7 +58,7 @@ int syscall_log_return(pid_t tracee_pid, int* status, syscall_table_t* syscall_t
     } else {
         fprintf(stderr, ") = %lli\n", regs.rax);
     }
-    
+
     (void) syscall_table;
     return (TC_OK);
 }

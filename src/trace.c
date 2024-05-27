@@ -54,14 +54,16 @@ int trace_loop(pid_t tracee_pid, int* status, trace_callback_t callbacks[], size
             return (-1);
         if (wait_and_block(tracee_pid, status) == -1)
             return (-1);
-        switch (callbacks[i].func(tracee_pid, status, callbacks[i].param))
-        {
-            case TC_OK:
-                break;
-            case TC_EXIT:
-                return (0);
-            case TC_ERROR:
-                return (-1);
+        if (WIFSTOPPED(*status)) {
+            switch (callbacks[i].func(tracee_pid, status, callbacks[i].param))
+            {
+                case TC_OK:
+                    break;
+                case TC_EXIT:
+                    return (0);
+                case TC_ERROR:
+                    return (-1);
+            }
         }
         i++;
         if (i >= callback_count) i = 0;
