@@ -17,8 +17,8 @@ enum {
 
 typedef struct trace_callback_s {
     enum {
-        TC_NEXT_STEP = PTRACE_SYSCALL,
-        TC_SYSCALL = PTRACE_SINGLESTEP,
+        TC_NEXT_STEP = PTRACE_SINGLESTEP,
+        TC_SYSCALL = PTRACE_SYSCALL,
     } at;
     int (*func)();
     void* param;
