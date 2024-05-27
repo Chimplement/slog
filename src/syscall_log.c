@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <elf.h>
 
 #include <sys/syscall.h>
 
@@ -17,8 +18,11 @@ int syscall_log_call(pid_t tracee_pid, syscall_table_t* syscall_table) {
 
     syscall_info_t syscall_info = syscall_table->content[syscall_num];
     fprintf(stderr, "%s(", syscall_info.name);
-    // choose different registers if executable is 32-bit
-    fprintf(stderr, syscall_info.argument_format, regs.rdi, regs.rsi, regs.rdx, regs.rcx, regs.r8, regs.r9);
+    
+    if (syscall_table->elf_class == ELFCLASS32)
+        fprintf(stderr, syscall_info.argument_format, regs.rbx, regs.rcx, regs.rdx, regs.rsi, regs.rdi, regs.rbp);
+    else if (syscall_table->elf_class == ELFCLASS64)
+        fprintf(stderr, syscall_info.argument_format, regs.rdi, regs.rsi, regs.rdx, regs.rcx, regs.r8, regs.r9);
     
     if (syscall_num == SYS_exit || syscall_num == SYS_exit_group) {
         fprintf(stderr, ") = ?\n");

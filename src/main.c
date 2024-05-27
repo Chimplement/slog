@@ -41,6 +41,7 @@ int main(int argc, char* argv[], char *envp[]) {
     uint8_t elf_class = elf_ident[EI_CLASS];
 
     syscall_table_t syscall_table;
+    syscall_table.elf_class = elf_class;
     switch (elf_class)
     {
         case ELFCLASS32:

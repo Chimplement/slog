@@ -1,6 +1,8 @@
 #ifndef SYSCALL_LOG_H
 # define SYSCALL_LOG_H
 
+# include <stdint.h>
+
 # include <sys/types.h>
 
 typedef struct syscall_info_s {
@@ -9,6 +11,7 @@ typedef struct syscall_info_s {
 } syscall_info_t;
 
 typedef struct syscall_table_s {
+    uint8_t elf_class;
     size_t size;
     syscall_info_t* content;
 } syscall_table_t;
