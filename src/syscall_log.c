@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <elf.h>
 
 #include <sys/syscall.h>
@@ -40,8 +41,13 @@ int syscall_log_return(pid_t tracee_pid, syscall_table_t* syscall_table) {
     siginfo_t siginfo;
     if (tracee_get_siginfo(tracee_pid, &siginfo) == -1)
         return (TC_ERROR);
-    
-    fprintf(stderr, ") = %lli\n", regs.rax);
+
+    if (siginfo.si_signo != SIGTRAP) {
+        fprintf(stderr, "<unfinished ...>\n");
+        fprintf(stderr, "--- Signal: %s {si_signo=%i, si_code=%i, si_pid=%i} ---\n", strsignal(siginfo.si_signo), siginfo.si_signo, siginfo.si_code, siginfo.si_pid);
+    } else {
+        fprintf(stderr, ") = %lli\n", regs.rax);
+    }
     (void) syscall_table;
     return (TC_OK);
 }
