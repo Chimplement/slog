@@ -66,12 +66,12 @@ int trace_loop(pid_t tracee_pid, int* status, trace_callback_t callbacks[], size
     return (0);
 }
 
-int get_regs(pid_t tracee_pid, struct user_regs_struct* regs) {
+int tracee_get_regs(pid_t tracee_pid, struct user_regs_struct* regs) {
     struct iovec regs_iov = {.iov_base = regs, .iov_len = sizeof(*regs)};
 
     return (ptrace(PTRACE_GETREGSET, tracee_pid, 1, &regs_iov));
 }
 
-int get_siginfo(pid_t tracee_pid, siginfo_t* siginfo) {
+int tracee_get_siginfo(pid_t tracee_pid, siginfo_t* siginfo) {
     return (ptrace(PTRACE_GETSIGINFO, tracee_pid, 0, &siginfo));
 }

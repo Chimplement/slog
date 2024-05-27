@@ -9,7 +9,7 @@
 
 int syscall_log_call(pid_t tracee_pid, syscall_table_t* syscall_table) {
     struct user_regs_struct regs;
-    if (get_regs(tracee_pid, &regs) == -1)
+    if (tracee_get_regs(tracee_pid, &regs) == -1)
         return (TC_ERROR);
 
     unsigned long long syscall_num = regs.orig_rax;
@@ -34,7 +34,7 @@ int syscall_log_call(pid_t tracee_pid, syscall_table_t* syscall_table) {
 
 int syscall_log_return(pid_t tracee_pid, syscall_table_t* syscall_table) {
     struct user_regs_struct regs;
-    if (get_regs(tracee_pid, &regs) == -1)
+    if (tracee_get_regs(tracee_pid, &regs) == -1)
         return (TC_ERROR);
     
     fprintf(stderr, ") = %lli\n", regs.rax);
