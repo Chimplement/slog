@@ -1,5 +1,5 @@
 #include <stddef.h>
-#define _POSIX_C_SOURCE 1
+#define _POSIX_C_SOURCE 199309L
 #include <signal.h>
 
 #include <sys/uio.h>
@@ -70,5 +70,8 @@ int get_regs(pid_t tracee_pid, struct user_regs_struct* regs) {
     struct iovec regs_iov = {.iov_base = regs, .iov_len = sizeof(*regs)};
 
     return (ptrace(PTRACE_GETREGSET, tracee_pid, 1, &regs_iov));
+}
 
+int get_siginfo(pid_t tracee_pid, siginfo_t* siginfo) {
+    return (ptrace(PTRACE_GETSIGINFO, tracee_pid, 0, &siginfo));
 }

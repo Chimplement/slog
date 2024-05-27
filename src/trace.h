@@ -1,6 +1,10 @@
 #ifndef TRACE_H
 # define TRACE_H
 
+# undef _POSIX_C_SOURCE
+# define _POSIX_C_SOURCE 199309L
+# include <signal.h>
+
 # include <sys/types.h>
 # include <sys/user.h>
 # include <sys/ptrace.h>
@@ -24,5 +28,6 @@ pid_t create_tracee(char* file, char* argv[], char* envp[]);
 int trace_loop(pid_t tracee_pid, int* status, trace_callback_t callbacks[], size_t callback_count);
 
 int get_regs(pid_t tracee_pid, struct user_regs_struct* regs);
+int get_siginfo(pid_t tracee_pid, siginfo_t* siginfo);
 
 #endif
