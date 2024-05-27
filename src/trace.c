@@ -2,8 +2,7 @@
 #define _POSIX_C_SOURCE 1
 #include <signal.h>
 
-#include <sys/types.h>
-#include <sys/ptrace.h>
+#include <sys/uio.h>
 #include <sys/wait.h>
 
 #include "proc.h"
@@ -65,4 +64,11 @@ int trace_loop(pid_t tracee_pid, int* status, trace_callback_t callbacks[], size
         if (i >= callback_count) i = 0;
     } while (!WIFEXITED(*status));
     return (0);
+}
+
+int get_regs(pid_t tracee_pid, struct user_regs_struct* regs) {
+    struct iovec regs_iov = {.iov_base = regs, .iov_len = sizeof(*regs)};
+
+    return (ptrace(PTRACE_GETREGSET, tracee_pid, 1, &regs_iov));
+
 }

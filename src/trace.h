@@ -2,6 +2,7 @@
 # define TRACE_H
 
 # include <sys/types.h>
+# include <sys/user.h>
 # include <sys/ptrace.h>
 
 enum {
@@ -21,5 +22,7 @@ typedef struct trace_callback_s {
 
 pid_t create_tracee(char* file, char* argv[], char* envp[]);
 int trace_loop(pid_t tracee_pid, int* status, trace_callback_t callbacks[], size_t callback_count);
+
+int get_regs(pid_t tracee_pid, struct user_regs_struct* regs);
 
 #endif
