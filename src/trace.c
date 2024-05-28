@@ -46,16 +46,14 @@ pid_t create_tracee(char* file, char* argv[], char* envp[]) {
     return (pid);
 }
 
-int trace_loop(pid_t tracee_pid, int* status, trace_callback_t callbacks[], size_t callback_count) {
-    size_t i = 0;
-
+int trace_loop(pid_t tracee_pid, int* status, trace_callback_t callback) {
     do {
-        if (ptrace((enum __ptrace_request)callbacks[i].at, tracee_pid, 0, 0) == -1)
+        if (ptrace((enum __ptrace_request)callback.at, tracee_pid, 0, 0) == -1)
             return (-1);
         if (wait_and_block(tracee_pid, status) == -1)
             return (-1);
         if (WIFSTOPPED(*status)) {
-            switch (callbacks[i].func(tracee_pid, status, callbacks[i].param))
+            switch (callback.func(tracee_pid, status, callback.param))
             {
                 case TC_OK:
                     break;
@@ -65,8 +63,6 @@ int trace_loop(pid_t tracee_pid, int* status, trace_callback_t callbacks[], size
                     return (-1);
             }
         }
-        i++;
-        if (i >= callback_count) i = 0;
     } while (!WIFEXITED(*status));
     return (0);
 }

@@ -63,14 +63,11 @@ int main(int argc, char* argv[], char *envp[]) {
     is_ok(trace_loop(
         tracee_pid,
         &status,
-        (trace_callback_t[]) {
-            {
+        (trace_callback_t) {
                 TC_SYSCALL,
                 options.summary ? syscall_count : syscall_log,
                 &syscall_table
-            }
-        },
-        1
+        }
     ), "Unexpected error while tracing the process");
     
     int exit_code = get_exit_code(status);
