@@ -16,9 +16,6 @@ int syscall_log_call(pid_t tracee_pid, int* status, syscall_table_t* syscall_tab
         return (TC_ERROR);
     }
 
-    if (regs.rax != (unsigned long)-ENOSYS)
-        return(syscall_log_return(tracee_pid, status, syscall_table));
-
     unsigned long long syscall_num = regs.orig_rax;
     if (syscall_num >= syscall_table->size)
         return (TC_ERROR);
@@ -44,9 +41,6 @@ int syscall_log_return(pid_t tracee_pid, int* status, syscall_table_t* syscall_t
     struct user_regs_struct regs;
     if (tracee_get_regs(tracee_pid, &regs) == -1)
         return (TC_ERROR);
-    
-    if (regs.rax == (unsigned long)-ENOSYS)
-        return(syscall_log_call(tracee_pid, status, syscall_table));
 
     if (WSTOPSIG(*status) != (SIGTRAP | 0x80)) {
         siginfo_t siginfo;
@@ -63,6 +57,18 @@ int syscall_log_return(pid_t tracee_pid, int* status, syscall_table_t* syscall_t
     return (TC_OK);
 }
 
+int syscall_log(pid_t tracee_pid, int* status, syscall_table_t* syscall_table) {
+    struct user_regs_struct regs;
+    if (tracee_get_regs(tracee_pid, &regs) == -1) {
+        return (TC_ERROR);
+    }
+
+    if (regs.rax == (unsigned long)-ENOSYS)
+        return(syscall_log_call(tracee_pid, status, syscall_table));
+    else
+        return(syscall_log_return(tracee_pid, status, syscall_table));
+}
+
 int syscall_count_call(pid_t tracee_pid, int* status, syscall_table_t* syscall_table) {
     (void) tracee_pid;
     (void) syscall_table;
@@ -75,6 +81,18 @@ int syscall_count_return(pid_t tracee_pid, int* status, syscall_table_t* syscall
     (void) syscall_table;
     (void) status;
     return (TC_OK);
+}
+
+int syscall_count(pid_t tracee_pid, int* status, syscall_table_t* syscall_table) {
+    struct user_regs_struct regs;
+    if (tracee_get_regs(tracee_pid, &regs) == -1) {
+        return (TC_ERROR);
+    }
+
+    if (regs.rax == (unsigned long)-ENOSYS)
+        return(syscall_count_call(tracee_pid, status, syscall_table));
+    else
+        return(syscall_count_return(tracee_pid, status, syscall_table));
 }
 
 void syscall_log_summary(syscall_table_t syscall_table) {
