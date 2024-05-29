@@ -83,8 +83,8 @@ int syscall_count_call(pid_t tracee_pid, int* status, syscall_table_t* syscall_t
         return (TC_EXIT);
     }
 
-    syscall_info_t syscall_info = syscall_table->content[syscall_num];
-    syscall_info.calls += 1;
+    syscall_info_t* syscall_info = &syscall_table->content[syscall_num];
+    syscall_info->calls += 1;
 
     (void) status;
     return (TC_OK);
@@ -104,9 +104,9 @@ int syscall_count_return(pid_t tracee_pid, int* status, syscall_table_t* syscall
     if (syscall_num >= syscall_table->size)
         return (TC_ERROR);
 
-    syscall_info_t syscall_info = syscall_table->content[syscall_num];
+    syscall_info_t* syscall_info = &syscall_table->content[syscall_num];
     if ((long) regs.rax < 0)
-        syscall_info.errors += 1;
+        syscall_info->errors += 1;
 
     (void) status;
     return (TC_OK);
@@ -125,5 +125,32 @@ int syscall_count(pid_t tracee_pid, int* status, syscall_table_t* syscall_table)
 }
 
 void syscall_log_summary(syscall_table_t syscall_table) {
-    (void) syscall_table;
+    unsigned long total_calls = 0;
+    unsigned long total_errors = 0;
+
+    fprintf(stderr, "%% time     seconds  usecs/call     calls    errors syscall\n");
+    fprintf(stderr, "------ ----------- ----------- --------- --------- ----------------\n");
+    for (size_t i = 0; i < syscall_table.size; i++) {
+        syscall_info_t syscall_info = syscall_table.content[i];
+        if (syscall_info.calls == 0)
+            continue;
+        fprintf(stderr, "%6.2f %11.6f %11lu %9lu %9lu %-16s\n",
+            0.0,
+            0.0,
+            (long unsigned)0,
+            syscall_info.calls,
+            syscall_info.errors,
+            syscall_info.name
+        );
+
+        total_calls += syscall_info.calls;
+        total_errors += syscall_info.errors;
+    }
+    fprintf(stderr, "------ ----------- ----------- --------- --------- ----------------\n");
+    fprintf(stderr, "100.00 %11.6f %11lu %9lu %9lu total\n",
+        0.0,
+        (long unsigned)0,
+        total_calls,
+        total_errors
+    );
 }
