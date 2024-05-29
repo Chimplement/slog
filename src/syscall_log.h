@@ -10,7 +10,7 @@ typedef struct syscall_info_s {
     const char* argument_format;
     unsigned long calls;
     unsigned long errors;
-    double total_time;
+    double seconds;
 } syscall_info_t;
 
 typedef struct syscall_table_s {
