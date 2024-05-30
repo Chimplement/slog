@@ -128,6 +128,12 @@ void syscall_log_summary(syscall_table_t syscall_table) {
     unsigned long total_calls = 0;
     unsigned long total_errors = 0;
     double total_seconds = 0.0;
+    for (size_t i = 0; i < syscall_table.size; i++) {
+        syscall_info_t syscall_info = syscall_table.content[i];
+        total_calls += syscall_info.calls;
+        total_errors += syscall_info.errors;
+        total_seconds += syscall_info.seconds;
+    }
 
     fprintf(stderr, "%% time     seconds  usecs/call     calls    errors syscall\n");
     fprintf(stderr, "------ ----------- ----------- --------- --------- ----------------\n");
@@ -136,17 +142,13 @@ void syscall_log_summary(syscall_table_t syscall_table) {
         if (syscall_info.calls == 0)
             continue;
         fprintf(stderr, "%6.2f %11.6f %11lu %9lu %9lu %-16s\n",
-            0.0,
+            (syscall_info.seconds / total_seconds) * 100,
             syscall_info.seconds,
             (long unsigned) (syscall_info.seconds * 1000000),
             syscall_info.calls,
             syscall_info.errors,
             syscall_info.name
         );
-
-        total_calls += syscall_info.calls;
-        total_errors += syscall_info.errors;
-        total_seconds += syscall_info.seconds;
     }
     fprintf(stderr, "------ ----------- ----------- --------- --------- ----------------\n");
     fprintf(stderr, "100.00 %11.6f %11lu %9lu %9lu total\n",
