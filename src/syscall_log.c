@@ -157,7 +157,7 @@ void syscall_log_summary(syscall_table_t syscall_table) {
         fprintf(stderr, "%6.2f %11.6f %11lu %9lu %9lu %-16s\n",
             (syscall_info.seconds / total_seconds) * 100,
             syscall_info.seconds,
-            (long unsigned) (syscall_info.seconds * 1000000),
+            (long unsigned) (syscall_info.seconds * 1000000 / syscall_info.calls),
             syscall_info.calls,
             syscall_info.errors,
             syscall_info.name
