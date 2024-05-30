@@ -17,21 +17,25 @@ int syscall_log_call(pid_t tracee_pid, int* status, syscall_table_t* syscall_tab
         return (TC_ERROR);
     }
 
-    unsigned long long syscall_num = regs.orig_rax;
+    unsigned long long syscall_num = (unsigned)regs.orig_rax;
     if (syscall_num >= syscall_table->size)
         return (TC_ERROR);
 
     syscall_info_t syscall_info = syscall_table->content[syscall_num];
     fprintf(stderr, "%s(", syscall_info.name);
     
-    if (syscall_table->elf_class == ELFCLASS32)
-        fprintf(stderr, syscall_info.argument_format, regs.rbx, regs.rcx, regs.rdx, regs.rsi, regs.rdi, regs.rbp);
-    else if (syscall_table->elf_class == ELFCLASS64)
+    if (syscall_table->elf_class == ELFCLASS32) {
+        fprintf(stderr, syscall_info.argument_format, (int)regs.rbx, (int)regs.rcx, (int)regs.rdx, (int)regs.rsi, (int)regs.rdi, (int)regs.rbp);
+        if (syscall_num == 1 || syscall_num == 252) {
+            fprintf(stderr, ") = ?\n");
+            return (TC_EXIT);
+        }
+    } else if (syscall_table->elf_class == ELFCLASS64) {
         fprintf(stderr, syscall_info.argument_format, regs.rdi, regs.rsi, regs.rdx, regs.rcx, regs.r8, regs.r9);
-    
-    if (syscall_num == SYS_exit || syscall_num == SYS_exit_group) {
-        fprintf(stderr, ") = ?\n");
-        return (TC_EXIT);
+        if (syscall_num == SYS_exit || syscall_num == SYS_exit_group) {
+            fprintf(stderr, ") = ?\n");
+            return (TC_EXIT);
+        }
     }
 
     (void) status;
@@ -51,7 +55,10 @@ int syscall_log_return(pid_t tracee_pid, int* status, syscall_table_t* syscall_t
         fprintf(stderr, "<unfinished ...>\n");
         fprintf(stderr, "--- Signal: %s {si_signo=%i, si_code=%i, si_pid=%i} ---\n", strsignal(siginfo.si_signo), siginfo.si_signo, siginfo.si_code, siginfo.si_pid);
     } else {
-        fprintf(stderr, ") = %lli\n", regs.rax);
+        if (syscall_table->elf_class == ELFCLASS32)
+            fprintf(stderr, ") = %i\n", (int)regs.rax);
+        else if (syscall_table->elf_class == ELFCLASS64)
+            fprintf(stderr, ") = %lli\n", regs.rax);
     }
 
     (void) syscall_table;
@@ -76,7 +83,7 @@ int syscall_count_call(pid_t tracee_pid, int* status, syscall_table_t* syscall_t
         return (TC_ERROR);
     }
 
-    unsigned long long syscall_num = regs.orig_rax;
+    unsigned long long syscall_num = (int)regs.orig_rax;
     if (syscall_num >= syscall_table->size)
         return (TC_ERROR);
 
@@ -101,13 +108,18 @@ int syscall_count_return(pid_t tracee_pid, int* status, syscall_table_t* syscall
         return (TC_OK);
     }
 
-    unsigned long long syscall_num = regs.orig_rax;
+    unsigned long long syscall_num = (int)regs.orig_rax;
     if (syscall_num >= syscall_table->size)
         return (TC_ERROR);
 
     syscall_info_t* syscall_info = &syscall_table->content[syscall_num];
-    if ((long) regs.rax < 0)
-        syscall_info->errors += 1;
+    if (syscall_table->elf_class == ELFCLASS32) {
+        if ((int) regs.rax < 0)
+            syscall_info->errors += 1;
+    } else if (syscall_table->elf_class == ELFCLASS64) {
+        if ((long) regs.rax < 0)
+            syscall_info->errors += 1;
+    }
 
     (void) status;
     return (TC_OK);
@@ -124,9 +136,8 @@ int syscall_count(pid_t tracee_pid, int* status, syscall_table_t* syscall_table)
     if (regs.rax == (unsigned long)-ENOSYS) {
         start_time = clock();
         return(syscall_count_call(tracee_pid, status, syscall_table));
-    }
-    else {
-        unsigned long long syscall_num = regs.orig_rax;
+    } else {
+        unsigned long long syscall_num = (int)regs.orig_rax;
         if (syscall_num >= syscall_table->size)
             return (TC_ERROR);
 
@@ -166,7 +177,7 @@ void syscall_log_summary(syscall_table_t syscall_table) {
     fprintf(stderr, "------ ----------- ----------- --------- --------- ----------------\n");
     fprintf(stderr, "100.00 %11.6f %11lu %9lu %9lu total\n",
         total_seconds,
-        (long unsigned) (total_seconds * 1000000),
+        (long unsigned) (total_seconds * 1000000 / total_calls),
         total_calls,
         total_errors
     );
