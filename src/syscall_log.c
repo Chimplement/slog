@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <elf.h>
+#include <time.h>
 #include <errno.h>
 
 #include <sys/syscall.h>
@@ -113,15 +114,27 @@ int syscall_count_return(pid_t tracee_pid, int* status, syscall_table_t* syscall
 }
 
 int syscall_count(pid_t tracee_pid, int* status, syscall_table_t* syscall_table) {
+    static clock_t start_time;
+
     struct user_regs_struct regs;
     if (tracee_get_regs(tracee_pid, &regs) == -1) {
         return (TC_ERROR);
     }
 
-    if (regs.rax == (unsigned long)-ENOSYS)
+    if (regs.rax == (unsigned long)-ENOSYS) {
+        start_time = clock();
         return(syscall_count_call(tracee_pid, status, syscall_table));
-    else
+    }
+    else {
+        unsigned long long syscall_num = regs.orig_rax;
+        if (syscall_num >= syscall_table->size)
+            return (TC_ERROR);
+
+        syscall_info_t* syscall_info = &syscall_table->content[syscall_num];
+        syscall_info->seconds += (double)(clock() - start_time) / CLOCKS_PER_SEC;
+        
         return(syscall_count_return(tracee_pid, status, syscall_table));
+    }
 }
 
 void syscall_log_summary(syscall_table_t syscall_table) {
