@@ -58,12 +58,16 @@ int trace_loop(pid_t tracee_pid, int* status, trace_callback_t callback) {
                 case TC_OK:
                     break;
                 case TC_EXIT:
-                    return (0);
+                    break;
                 case TC_ERROR:
                     return (-1);
             }
         }
     } while (!WIFEXITED(*status));
+    while (!WIFEXITED(*status)) {
+        if (wait_and_block(tracee_pid, status) == -1)
+            return (-1);
+    }
     return (0);
 }
 
