@@ -19,6 +19,17 @@ static syscall_info_t syscall_table_x86_64[] = {
 #include <syscall_tables/x86_64.h>
 };
 
+void check_class_switch(pid_t tracee_pid, regs_t regs) {
+    static int old_class = R_86_64;
+
+    if ((int)regs.class != old_class) {
+        old_class = regs.class;
+        fprintf(stderr, "[ Process PID=%i runs in %s mode. ]\n",
+            tracee_pid, regs.class == R_86_64 ? "64 bit" : "32 bit"
+        );
+    }
+}
+
 int syscall_log_call(regs_t regs, unsigned long syscall_num) {
     syscall_info_t syscall_info = regs.class == R_86_64 ? syscall_table_x86_64[syscall_num] : syscall_table_i386[syscall_num];
     fprintf(stderr, "%s(", syscall_info.name);
@@ -59,6 +70,7 @@ int syscall_log_return(pid_t tracee_pid, regs_t regs, int* status) {
         else
             fprintf(stderr, ") = %i\n", (int)regs.i386_r.eax);
     }
+    check_class_switch(tracee_pid, regs);
     return (TC_OK);
 }
 
@@ -120,6 +132,7 @@ int syscall_count(pid_t tracee_pid, int* status) {
     if (tracee_get_regs(tracee_pid, &regs) == -1) {
         return (TC_ERROR);
     }
+    check_class_switch(tracee_pid, regs);
 
     unsigned long syscall_num = regs.class == R_86_64 ? regs.x86_64_r.orig_rax : regs.i386_r.orig_eax;
     bool is_call = regs.class == R_86_64 ?
@@ -143,7 +156,7 @@ int syscall_count(pid_t tracee_pid, int* status) {
     }
 }
 
-void syscall_log_summary() {
+void syscall_log_summary_64() {
     unsigned long total_calls = 0;
     unsigned long total_errors = 0;
     double total_seconds = 0.0;
@@ -176,4 +189,48 @@ void syscall_log_summary() {
         total_calls,
         total_errors
     );
+}
+
+void syscall_log_summary_32() {
+    unsigned long total_calls = 0;
+    unsigned long total_errors = 0;
+    double total_seconds = 0.0;
+    for (size_t i = 0; i < sizeof(syscall_table_i386)/sizeof(*syscall_table_i386); i++) {
+        syscall_info_t syscall_info = syscall_table_i386[i];
+        total_calls += syscall_info.calls;
+        total_errors += syscall_info.errors;
+        total_seconds += syscall_info.seconds;
+    }
+
+    if (total_calls == 0)
+        return ;
+
+    fprintf(stderr, "System call usage summary for 32 bit mode:\n");
+    fprintf(stderr, "%% time     seconds  usecs/call     calls    errors syscall\n");
+    fprintf(stderr, "------ ----------- ----------- --------- --------- ----------------\n");
+    for (size_t i = 0; i < sizeof(syscall_table_i386)/sizeof(*syscall_table_i386); i++) {
+        syscall_info_t syscall_info = syscall_table_i386[i];
+        if (syscall_info.calls == 0)
+            continue;
+        fprintf(stderr, "%6.2f %11.6f %11lu %9lu %9lu %-16s\n",
+            (syscall_info.seconds / total_seconds) * 100,
+            syscall_info.seconds,
+            (long unsigned) (syscall_info.seconds * 1000000 / syscall_info.calls),
+            syscall_info.calls,
+            syscall_info.errors,
+            syscall_info.name
+        );
+    }
+    fprintf(stderr, "------ ----------- ----------- --------- --------- ----------------\n");
+    fprintf(stderr, "100.00 %11.6f %11lu %9lu %9lu total\n",
+        total_seconds,
+        (long unsigned) (total_seconds * 1000000 / total_calls),
+        total_calls,
+        total_errors
+    );
+}
+
+void syscall_log_summary() {
+    syscall_log_summary_64();
+    syscall_log_summary_32();
 }
