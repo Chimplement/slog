@@ -67,10 +67,20 @@ int trace_loop(pid_t tracee_pid, int* status, trace_callback_t callback) {
     return (0);
 }
 
-int tracee_get_regs(pid_t tracee_pid, struct user_regs_struct* regs) {
-    struct iovec regs_iov = {.iov_base = regs, .iov_len = sizeof(*regs)};
+int tracee_get_regs(pid_t tracee_pid, regs_t* regs) {
+    struct iovec regs_iov = {.iov_base = &regs->x86_64_r, .iov_len = sizeof(struct user_regs_struct)};
 
-    return (ptrace(PTRACE_GETREGSET, tracee_pid, 1, &regs_iov));
+    if (ptrace(PTRACE_GETREGSET, tracee_pid, 1, &regs_iov) == -1) {
+        return (-1);
+    }
+
+    if (regs_iov.iov_len == sizeof(struct i386_user_regs_struct)) {
+        regs->class = R_I386;
+    } else {
+        regs->class = R_86_64;
+    }
+
+    return (0);
 }
 
 int tracee_get_siginfo(pid_t tracee_pid, siginfo_t* siginfo) {

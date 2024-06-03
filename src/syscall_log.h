@@ -13,17 +13,10 @@ typedef struct syscall_info_s {
     double seconds;
 } syscall_info_t;
 
-typedef struct syscall_table_s {
-    uint8_t elf_class;
-    size_t size;
-    syscall_info_t* content;
-} syscall_table_t;
+int syscall_log(pid_t tracee_pid, int* status);
 
+int syscall_count(pid_t tracee_pid, int* status);
 
-int syscall_log(pid_t tracee_pid, int* status, syscall_table_t* syscall_table);
-
-int syscall_count(pid_t tracee_pid, int* status, syscall_table_t* syscall_table);
-
-void syscall_log_summary(syscall_table_t syscall_table);
+void syscall_log_summary();
 
 #endif
