@@ -12,7 +12,7 @@ Using Slog to trace for example `ls` is relatively simple:
 ./slog ls
 ```
 and will give you a similar result to:
-```bash
+```c
 execve(0x5621aab191a0, 0x7ffd575f2c50, 0x7ffd575f2c60) = 0
 brk(0) = 94824348532736
 mmap(0, 8192, 3, 140711493732402, 4294967295, 0) = 140711493591040
