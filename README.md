@@ -34,8 +34,8 @@ if instead you want a summary you simply run:
 ### Building
 To build Slog you just run make:
 ```bash
-git clone https://github.com/Chimplement/nettena.git nettena
-cd nettena
+git clone https://github.com/Chimplement/slog.git slog
+cd slog
 make
 ```
 
