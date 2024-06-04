@@ -40,3 +40,4 @@ make
 ```
 
 ## Why
+I made Slog as an exercise for school, to learn about ptrace and strace. This is also the reason for a couple of odd choices in ptrace requests, like using `PTRACE_SEIZE` and `PTRACE_INTERRUPT` instead of `PTRACE_ATTACH` or `PTRACE_TRACEME`, as the subject had restricted those.
