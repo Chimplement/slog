@@ -62,7 +62,6 @@ int syscall_log_return(pid_t tracee_pid, regs_t regs, int* status) {
         if (tracee_get_siginfo(tracee_pid, &siginfo) == -1)
             return (TC_ERROR);
 
-        fprintf(stderr, "<unfinished ...>\n");
         fprintf(stderr, "--- Signal: %s {si_signo=%i, si_code=%i, si_pid=%i} ---\n", strsignal(siginfo.si_signo), siginfo.si_signo, siginfo.si_code, siginfo.si_pid);
     } else {
         if (regs.class == R_86_64)
